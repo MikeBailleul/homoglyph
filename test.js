@@ -13,3 +13,12 @@ test('decode', t => {
   const output = homoglyph.decode(input)
   t.same(output, text)
 })
+
+test('excludeFromDict', t => {
+  const text = 'w'
+
+  homoglyph.excludeFromDict(['\u{1D21}'])
+
+  const output = homoglyph.encode(text, { probability: 100 })
+  t.same(text, output)
+})

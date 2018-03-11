@@ -7,7 +7,36 @@ module.exports = {
   dict,
   reverse,
   decode,
-  encode
+  encode,
+  excludeFromDict
+}
+
+let customDict;
+
+function excludeFromDict (charsToExclude) {
+  customDict = dict;
+  if (charsToExclude.length > 0) {
+    charsToExclude.forEach(toExclude => {
+      for (let pair of customDict) {
+        const [ascii, fakeLetters] = pair;
+        const index = fakeLetters.indexOf(toExclude);
+
+        if (index !== -1) {
+          fakeLetters.splice(index, 1);
+
+          if (fakeLetters.length > 0) {
+            // there are still some fake letters after removing this one
+            customDict.set(ascii, fakeLetters)
+          } else {
+            // no other fake letters, we remove it from the Map
+            customDict.delete(ascii)
+          }
+
+        }
+      }
+    })
+  }
+  // console.log('New dict', customDict)
 }
 
 function decode (text) {
@@ -20,7 +49,7 @@ function encode (text, opts) {
     chars: ''
   }, opts)
 
-  return replace(text, dict, () => Math.random() < (opts.probability / 100), opts)
+  return replace(text, customDict || dict, () => Math.random() < (opts.probability / 100), opts)
 }
 
 function splice (str, index, count, add) {
